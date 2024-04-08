@@ -1,0 +1,4 @@
+status = 201
+And data = [object Object]
+username = testUser1712603508205
+password = 1qaz@WSX

@@ -1,0 +1,27 @@
+{
+  "name": "ui_tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "testBooks": "mocha ./api/testWithBooks.js",
+    "testAccounts": "mocha ./api/testWithAccounts.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.42.1",
+    "@types/axios": "^0.14.0",
+    "@types/node": "^20.11.25",
+    "allure-commandline": "^2.27.0",
+    "allure-playwright": "2.15.1",
+    "chai": "^5.1.0",
+    "mocha": "^10.4.0"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "dotenv": "^16.4.5",
+    "log4js": "^6.9.1"
+  }
+}
