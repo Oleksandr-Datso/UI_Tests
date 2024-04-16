@@ -3,7 +3,7 @@ const AccountApi = require("./AccountApi");
 import { BaseApi } from "./BaseApi";
 // const BaseApi = require("./BaseApi");
 
-module.exports = class BookStoreApi extends BaseApi {
+export class BookStoreApi extends BaseApi {
   constructor(baseURL) {
     super(baseURL);
   }
@@ -31,6 +31,7 @@ module.exports = class BookStoreApi extends BaseApi {
         ...this.headers,
         Authorization: `Bearer ${token}`,
       },
+      validateStatus: (status) => status === 201 || status === 401 || status === 400,
     };
 
     const { status, data } = await axios.post(

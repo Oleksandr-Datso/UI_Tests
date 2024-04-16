@@ -3,7 +3,7 @@ import { BaseApi } from "./BaseApi";
 // const BaseApi = require("./BaseApi");
 const credentials = require("./credentials");
 
-module.exports = class AccountApi extends BaseApi {
+export class AccountApi extends BaseApi {
     constructor(baseURL) {
       super(baseURL);
     }

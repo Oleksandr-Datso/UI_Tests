@@ -1,9 +1,9 @@
-import axios from "axios";
-const credentials = require("./credentials");
-const AccountApi = require("./AccountApi");
+// import axios from "axios";
+// import { AccountApi } from '../api/AccountApi';
+// import { BookStoreApi } from '../api/BookStoreApi';
 
 
-module.exports = class DataClass {
+export class DataClass {
     static async generateIsbnIndex(count:number) {
         const isbnToUse = parseInt((Math.random() * (count-1)).toString());  //parseInt equal to Number or MAth.round()
         // showLog.info(isbnToUse);
