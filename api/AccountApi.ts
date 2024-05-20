@@ -23,6 +23,8 @@ export class AccountApi extends BaseApi {
         config
       );
       //console.log(status, JSON.stringify(data, null, 4)); // 4 пробела вместо таба
+      // console.log("status = " + status + "\nAnd data = " + data);
+      console.log("username = " + userName + "\npassword = " + password);
       return { status, data };
     }
     async createAlreadyCreatedUser(userName, password) {
