@@ -1,7 +1,7 @@
 import axios from "axios";
 import { BaseApi } from "./BaseApi";
 // const BaseApi = require("./BaseApi");
-const credentials = require("./credentials");
+// const credentials = require("./credentials");
 
 export class AccountApi extends BaseApi {
     constructor(baseURL) {

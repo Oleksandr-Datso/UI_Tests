@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "testBooks": "mocha ./api/testWithBooks.js",
     "testAccounts": "mocha ./api/testWithAccounts.js"
@@ -11,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@playwright/test": "^1.42.1",
+    "@playwright/test": "^1.44.1",
     "@types/axios": "^0.14.0",
     "@types/node": "^20.11.25",
     "allure-commandline": "^2.27.0",

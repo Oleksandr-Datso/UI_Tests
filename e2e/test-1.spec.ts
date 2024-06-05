@@ -35,35 +35,35 @@ test.describe("Tests with Login", async () => {
     
     await expect(page).toHaveURL("https://demoqa.com/profile");
     await expect(page.getByText(userName)).toBeVisible();
-  })
+  });
   test("Login page with empty data", async ({ page }) => {
     userName = "";
     await loginPage.open();
     await loginPage.login({userName, password});
     // Expect is present in method, need to find way to add it here instead
     expect(await loginPage.isInvalid({userName, attributeName})).toBeTruthy();    
-  })
+  });
   test("Register new user", async ({ page }) => {
     await loginPage.open();
     await loginPage.registerNewUser({firstName, lastName, userName, password});
     console.log("New registered user -> " + userName);
 
     // what expect to add here?
-  })
+  });
   test("Register existing user", async ({ page }) => {
     await loginPage.open();
     await loginPage.registerNewUser({firstName, lastName, userName, password});
 
     expect(page.locator("#name")).toBeVisible();
     expect(page.getByText("User exists!")).toBeVisible();
-  })
+  });
   test("Register new user with empty data", async ({ page }) => {
     await loginPage.open();
     userName = "";
     await loginPage.registerNewUser({firstName, lastName, userName, password});
 
     expect(await loginPage.isInvalid({userName, attributeName})).toBeTruthy();
-  })
+  });
   test("Login back button from Registration page", async ({ page }) => {
     await loginPage.open();
     userName = "";
@@ -71,93 +71,49 @@ test.describe("Tests with Login", async () => {
     await loginPage.backToLoginFromRegistration();
 
     expect(page).toHaveURL("https://demoqa.com/login");    
-  })
+  });
   test("Book Store page", async ({ page }) => {
     await loginPage.open();
     await loginPage.navigateToBookStorePage();
     await expect(page).toHaveURL("https://demoqa.com/books");
-  })
+  });
   test("Search book on Book Store page", async ({ page }) => {
     await loginPage.open();
     await loginPage.navigateToBookStorePage();
     await loginPage.searchBook(book);
 
     expect(await page.getByRole("link", {name: book})).toBeVisible();
-  })
+  });
   test("Login button from Book Store page", async ({ page }) => {
     await loginPage.open();
     await loginPage.navigateToBookStorePage();
     await loginPage.navigateToLoginPage();
 
     expect(await page.getByText("Welcome,")).toBeVisible();
-  })
+  });
   test("Check not loggin text when open Profile page without logged in", async ({ page }) => {
     await loginPage.open();
     await loginPage.navigateToProfilePage();
 
     expect(await page.locator("#notLoggin-label")).toBeVisible();
     expect(await page.getByText("Currently you are not logged into the Book Store application, please visit the ")).toBeVisible();
-  })
+  });
   test("Check redirection to Login page after logged in", async ({ page }) => {
     await loginPage.open();
     await loginPage.login({userName, password});
     await loginPage.navigateToLoginPage();
 
     expect(await page.getByText("You are already logged in. View your ")).toBeVisible();
-  })
+  });
   test("Logout", async ({ page }) => {
     await loginPage.open();
     await loginPage.login({userName, password});
     await loginPage.logout();
 
     expect(page).toHaveURL("https://demoqa.com/login");
-  })
-})
-  
-
-
-
-
-/*
-  test("Successfully Login", async ({ page }) => {
-    test.slow();
-    await successfullyLogin(page, userName, password);
-    await expect(page.getByText(userName)).toBeVisible();
-    await page.close();
-  });
-  test("Login Failed with empty fields", async ({ page }) => {
-    test.slow();
-    userName = "";
-    password = "";
-    await Login(page);
-    await page.close();
-  });
-  test("Log out after successfully Login", async ({ page }) => {
-    test.slow();
-    await logoutAfterLogin(page, userName, password);
-    await page.close();
-  });
-  test("Check book store availability when logged in", async ({ page }) => {
-    test.slow();
-    await bookStoreWhenLogin(page, userName, password);
-    await page.close();
-  })
-  test("Check book store availability", async ({ page }) => {
-    test.slow();
-    await bookStoreCheck(page);
-    await page.close();
-  });
-  test("Check book store availability using getByRoleOrLabel", async ({ page }) => {
-    test.slow();
-    await bookStoreCheckWithGetByRole(page, userName, password);
-    await page.close();
-  });
-  test("Navigate to Login page when successfully Login", async ({ page }) => {
-    test.slow();
-    await loginPageCheckWhenLoggedIn(page, userName, password);
-    await page.close();
   });
 });
+  
 
 test.describe("Add books via API call to the created user by another API", async () => {
   //For creating user needed variables:
@@ -198,7 +154,7 @@ test.describe("Add books via API call to the created user by another API", async
       expect(addBookToTheUser).toHaveProperty("status", 201);
       console.log(createNewUser.data.books); //If I add book, it is not shown, why?!
 
-      await successfullyLogin(page, userName, password);
+      // await successfullyLogin(page, userName, password);
 
       // await page.goto("https://demoqa.com/");
       // await page.locator("div:nth-of-type(6)>div>.card-up").click();
@@ -228,7 +184,7 @@ test.describe("Add books via API call to the created user by another API", async
       );
       expect(addBookToTheUser).toHaveProperty("status", 401);
 
-      await successfullyLogin(page, userName, password);
+      // await successfullyLogin(page, userName, password);
       // await page.goto("https://demoqa.com/");
       // await page.locator("div:nth-of-type(6)>div>.card-up").click();
       // await page
@@ -256,7 +212,7 @@ test.describe("Add books via API call to the created user by another API", async
       );
       expect(addBookToTheUser).toHaveProperty("status", 400);
 
-      await successfullyLogin(page, userName, password);
+      // await successfullyLogin(page, userName, password);
       // await page.goto("https://demoqa.com/");
       // await page.locator("div:nth-of-type(6)>div>.card-up").click();
       // await page
@@ -296,7 +252,7 @@ test.describe("Add books via API call to the created user by another API", async
       );
       expect(addAnotherBookToTheUser).toHaveProperty("status", 201);
 
-      await successfullyLogin(page, userName, password);
+      // await successfullyLogin(page, userName, password);
       // await page.goto("https://demoqa.com/");
       // await page.locator("div:nth-of-type(6)>div>.card-up").click();
       // await page
@@ -598,7 +554,7 @@ test.describe("Add books via API call to the created user by another API", async
     });
   });
 });
-*/
+
 
 /*
 test('test', async ({ page }) => {
