@@ -1,5 +1,6 @@
 import axios from "axios";
-const AccountApi = require("./AccountApi");
+import { AccountApi } from "./AccountApi";
+// const AccountApi = require("./AccountApi");
 import { BaseApi } from "./BaseApi";
 // const BaseApi = require("./BaseApi");
 

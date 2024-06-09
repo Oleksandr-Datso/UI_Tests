@@ -1,4 +1,4 @@
-import { test, expect, chromium } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 import axios from "axios";
 import { testUserData } from "../api/credentials";
 import { AccountApi } from "../api/AccountApi";
@@ -10,7 +10,7 @@ import { LoginPage } from "./LoginFunctions";
 
 let accountApi = new AccountApi("https://demoqa.com");
 let bookStoreApi = new BookStoreApi("https://demoqa.com");
-const loginPage = new LoginPage("https://demoqa.com");
+let loginPage;
 
 test.describe("Tests with Login", async () => {
   // Needed variables for creating user using in all tests
@@ -21,8 +21,9 @@ test.describe("Tests with Login", async () => {
   let attributeName = "class";
   let book = "Speaking JavaScript";
 
-  test.beforeEach("Create new user via API call", async () => {
+  test.beforeEach("Create new user via API call", async ({ page }) => {
     await accountApi.createNewUser(userName, password);
+    loginPage = new LoginPage(page);
   });
   // test.afterEach("End of the test", async ({ page }) => {
   // чого в мене автоматично не закривається браузер після тесту
@@ -41,7 +42,7 @@ test.describe("Tests with Login", async () => {
     await loginPage.open();
     await loginPage.login({userName, password});
     // Expect is present in method, need to find way to add it here instead
-    expect(await loginPage.isInvalid({userName, attributeName})).toBeTruthy();    
+    expect(await loginPage.isInvalid(attributeName)).toBeTruthy();    
   });
   test("Register new user", async ({ page }) => {
     await loginPage.open();

@@ -1,7 +1,7 @@
-import { Page, expect } from '@playwright/test';
+import { type Page, type Locator, expect } from '@playwright/test';
 
 export class LoginPage {
-    userNameField; 
+    userNameField;
     passwordField; 
     loginButton; 
     newUserButton;
@@ -10,13 +10,13 @@ export class LoginPage {
     registerButton;
     backToLoginButton;
     searchBoxField;
-    logoutButton
+    logoutButton;
 
-    constructor(private page) {//щоб не передавати кожен раз page у методи, стає атрібутом класа, який можно переюзати
+    constructor(private page: Page) { //щоб не передавати кожен раз page у методи, стає атрібутом класа, який можно переюзати
         this.userNameField = this.page.locator("#userName");
         this.passwordField = this.page.locator("#password");
         this.loginButton = this.page.locator("#login");
-        this.newUserButton = this.page.locator("#newUSer");
+        this.newUserButton = this.page.locator("#newUser");
         this.firstNameField = this.page.locator("#firstname");
         this.lastNameField = this.page.locator("#lastname");
         this.registerButton = this.page.locator("#register");
@@ -46,12 +46,13 @@ export class LoginPage {
     async backToLoginFromRegistration() {
         await this.backToLoginButton.click();
     }
-    async isInvalid(userCredential: {userName, attributeName}) {
-        let element = await this.userNameField.fill(userCredential.userName);
-        let element2 = await element.getAttribute("`${attributeName}`");
+    async isInvalid(attributeName) {
+        // let element = await this.userNameField.fill(userCredential.userName); no need to fill empty string
+        let usernameFieldValue = await this.userNameField.getAttribute(attributeName);
         // let element2 = await element.getAttribute("class");
         // username and password contain is-invalid tag in DevTools
-        await expect(element2?.includes("is-invalid")).toBe(true);
+        // await expect(element2?.includes("is-invalid")).toBe(true);
+        return usernameFieldValue.includes("is-invalid"); // true if tag exists, false - if not
     }
     async navigateToBookStorePage() {
         await this.page.goto("https://demoqa.com/books");
