@@ -7,7 +7,7 @@
   "scripts": {
     "testBooks": "mocha ./api/testWithBooks.js",
     "testAccounts": "mocha ./api/testWithAccounts.js",
-    "test": "playwright test --reporter=dot"
+    "test": "playwright test"
   },
   "keywords": [],
   "author": "",

@@ -1,5 +1,7 @@
 import { type Page, type Locator, expect } from '@playwright/test';
 
+type UserCredentials = {userName: string; password: string}; // тип UserCredentials з обов'язковими пропертіс userName і password, які будуть приймати тільки тип string
+
 export class LoginPage {
     userNameField;
     passwordField; 
@@ -29,7 +31,7 @@ export class LoginPage {
         await this.page.locator("div:nth-of-type(6)>div>.card-up").click();
         await this.page.locator(".collapse.element-list.show > .menu-list > li:nth-of-type(1)").click();
     }
-    async login(userCredential: {userName, password}) {
+    async login(userCredential: UserCredentials) { //як аргумент приймаємо один об'єкт userCredential типу UserCredentials
         await this.userNameField.fill(userCredential.userName);
         await this.passwordField.fill(userCredential.password);
         await this.loginButton.click();
@@ -40,7 +42,8 @@ export class LoginPage {
         await this.lastNameField.fill(userCredentials.lastName);
         await this.userNameField.fill(userCredentials.userName);
         await this.passwordField.fill(userCredentials.password);
-        await this.page.locator("#recaptcha-anchor").click();
+        await this.page.locator("#g-recaptcha").click(); //locator("#recaptcha-anchor").click(); 
+        await this.page.waitForTimeout(3000);
         await this.registerButton.click();
     }
     async backToLoginFromRegistration() {
@@ -73,4 +76,40 @@ export class LoginPage {
     // додати по аналогії строінки з profile, bookstore, і тд
     // 1 page = 1 сторінка
     // загальні елементи (for ex. header, footer) винести в окремі компоненти і підключати їх і загальному коді
+    async isbnsSwitch(randomIsbn) {
+        switch(randomIsbn) {
+            case '9781449325862':
+              await expect(this.page.getByRole("link", {name: "Git Pocket Guide"})).toContainText("Git Pocket Guide");
+              console.log("case #1");
+              break;
+            case '9781449331818':
+              await expect(this.page.getByRole("link", {name: "Learning JavaScript Design Patterns"})).toContainText("Learning JavaScript Design Patterns");
+              console.log("case #2");
+              break;
+            case '9781449337711':
+              await expect(this.page.getByRole("link", {name: "Designing Evolvable Web APIs with ASP.NET"})).toContainText("Designing Evolvable Web APIs with ASP.NET");
+              console.log("case #3");
+              break;
+            case '9781449365035':
+              await expect(this.page.getByRole("link", {name: "Speaking JavaScript"})).toContainText("Speaking JavaScript");
+              console.log("case #4");
+              break;
+            case '9781491904244':
+              await expect(this.page.getByRole("link", {name: "You Don't Know JS"})).toContainText("You Don't Know JS");
+              console.log("case #5");
+              break;
+            case '9781491950296':
+              await expect(this.page.getByRole("link", {name: "Programming JavaScript Applications"})).toContainText("Programming JavaScript Applications");
+              console.log("case #6");
+              break;
+            case '9781593275846':
+              await expect(this.page.getByRole("link", {name: "Eloquent JavaScript, Second Edition"})).toContainText("Eloquent JavaScript, Second Edition");
+              console.log("case #7");
+              break;
+            case '9781593277574':
+              await expect(this.page.getByRole("link", {name: "Understanding ECMAScript 6"})).toContainText("Understanding ECMAScript 6");
+              console.log("case #8");
+              break;
+          }
+    }
 }

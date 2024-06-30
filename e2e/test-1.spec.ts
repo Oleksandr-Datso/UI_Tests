@@ -12,6 +12,11 @@ let accountApi = new AccountApi("https://demoqa.com");
 let bookStoreApi = new BookStoreApi("https://demoqa.com");
 let loginPage;
 
+test("check open", async({ page }) => {
+  loginPage = new LoginPage(page);
+  await loginPage.open();
+})
+
 test.describe("Tests with Login", async () => {
   // Needed variables for creating user using in all tests
   let userName = `testUser${Date.now()}`;
@@ -55,15 +60,18 @@ test.describe("Tests with Login", async () => {
     await loginPage.open();
     await loginPage.registerNewUser({firstName, lastName, userName, password});
 
-    expect(page.locator("#name")).toBeVisible();
-    expect(page.getByText("User exists!")).toBeVisible();
+    expect(await page.getByText('User exists!').isVisible());
+    expect(await page.getByRole('heading', { name: 'Register', exact: true }).isVisible());
+    // expect(await page.getByText("Register to Book Store")).toBeVisible(); // ТАК ПОКАЗУЄ ЕРРОР. цікаво, тому що ми поза дужок експекту
+    // expect(page.locator('//*[@id="name"]')).toBeVisible();
+    // expect(page.locator("#name")).toContainText("User exists!");
   });
-  test("Register new user with empty data", async ({ page }) => {
+  test("Register new user with empty data", async ({}) => {
     await loginPage.open();
     userName = "";
     await loginPage.registerNewUser({firstName, lastName, userName, password});
 
-    expect(await loginPage.isInvalid({userName, attributeName})).toBeTruthy();
+    expect(await loginPage.isInvalid(attributeName)).toBeTruthy();
   });
   test("Login back button from Registration page", async ({ page }) => {
     await loginPage.open();
@@ -71,7 +79,8 @@ test.describe("Tests with Login", async () => {
     await loginPage.registerNewUser({firstName, lastName, userName, password});
     await loginPage.backToLoginFromRegistration();
 
-    expect(page).toHaveURL("https://demoqa.com/login");    
+    expect(await page.getByText("Login in Book Store").isVisible());
+    await expect(page).toHaveURL("https://demoqa.com/login");    
   });
   test("Book Store page", async ({ page }) => {
     await loginPage.open();
@@ -83,7 +92,7 @@ test.describe("Tests with Login", async () => {
     await loginPage.navigateToBookStorePage();
     await loginPage.searchBook(book);
 
-    expect(await page.getByRole("link", {name: book})).toBeVisible();
+    expect(await page.getByRole("link", {name: book}).isVisible());
   });
   test("Login button from Book Store page", async ({ page }) => {
     await loginPage.open();
@@ -96,49 +105,65 @@ test.describe("Tests with Login", async () => {
     await loginPage.open();
     await loginPage.navigateToProfilePage();
 
-    expect(await page.locator("#notLoggin-label")).toBeVisible();
-    expect(await page.getByText("Currently you are not logged into the Book Store application, please visit the ")).toBeVisible();
+    expect(await page.locator("#notLoggin-label").isVisible());
+    expect(await page.getByText("Currently you are not logged into the Book Store application, please visit the ").isVisible());
   });
   test("Check redirection to Login page after logged in", async ({ page }) => {
     await loginPage.open();
     await loginPage.login({userName, password});
     await loginPage.navigateToLoginPage();
 
-    expect(await page.getByText("You are already logged in. View your ")).toBeVisible();
+    expect(await page.getByText("You are already logged in. View your ").isVisible());
   });
   test("Logout", async ({ page }) => {
     await loginPage.open();
     await loginPage.login({userName, password});
     await loginPage.logout();
 
-    expect(page).toHaveURL("https://demoqa.com/login");
+    expect(await page.getByText("Login in Book Store").isVisible());
+    await expect(page).toHaveURL("https://demoqa.com/login");
   });
 });
-  
+
 
 test.describe("Add books via API call to the created user by another API", async () => {
   //For creating user needed variables:
   let userName = `testUser${Date.now()}`;
   let password = "1qaz@WSX";
+  let book = "Speaking JavaScript";
+  let isbnNumber = "9781449365035";
 
   //For do actions with books needed variables:
   let createNewUser, userId, token, randomIsbn;
 
   test.describe("Receive all results when adding book to the user", async () => {
-    test.beforeEach(
-      "Create user with token & userId by calling API", async () => {
-        createNewUser = await accountApi.createNewUser(userName, password);
-        token = (await accountApi.generateToken(userName, password)).data.token;
-        const authorization = await accountApi.authorization(
-          userName,
-          password
-        );
-        userId = createNewUser.data.userID;
-        console.log(createNewUser.data);
-      }
-    );
+    test.beforeEach("Create new user via API call", async ({ page }) => {
+      createNewUser = await accountApi.createNewUser(userName, password);
+      token = (await accountApi.generateToken(userName, password)).data.token;
+      userId = createNewUser.data.userID;
+      loginPage = new LoginPage(page); 
+    });
+    test("Check added book!!! Add one book to the user by isbn book number", async ({ page }) => {
+      const isbnNumberField = isbnNumber;
 
-    test("NEED UPDATE -> check added book!!! Add one random book to the user by isbn book number", async ({ page }) => {
+      // Add book to the user's collection
+      const addBookToTheUser = await bookStoreApi.addBookToTheUserByIsbn(
+        userId,
+        token,
+        [isbnNumberField]
+      );
+      expect(addBookToTheUser).toHaveProperty("status", 201);
+      // Update data for the created user (to see books)
+      createNewUser = await accountApi.getUser(userId, token);
+      console.log(createNewUser.data.books);
+
+      await loginPage.open();
+      await loginPage.login({userName, password});
+      await expect(page).toHaveURL("https://demoqa.com/profile");
+      await expect(page.getByRole("link", {name: "Speaking JavaScript"})).toContainText("Speaking JavaScript");
+    });
+
+    test("Check added book!!! Add one random book to the user by isbn book number", async ({ page }) => {
       test.slow();
       const isbnNumbers = await bookStoreApi.getAllIsbns();
       expect(isbnNumbers.length, "No books in isbn numbers").toBeGreaterThan(0);
@@ -153,23 +178,18 @@ test.describe("Add books via API call to the created user by another API", async
         [randomIsbn]
       );
       expect(addBookToTheUser).toHaveProperty("status", 201);
-      console.log(createNewUser.data.books); //If I add book, it is not shown, why?!
+      createNewUser = await accountApi.getUser(userId, token);
+      // Update data for the created user (to see books)
+      console.log(createNewUser.data.books);
+      console.log("ISBN = " + randomIsbn);
 
-      // await successfullyLogin(page, userName, password);
+      await loginPage.open();
+      await loginPage.login({userName, password});
+      await expect(page).toHaveURL("https://demoqa.com/profile");
+      await loginPage.isbnsSwitch(randomIsbn);
 
-      // await page.goto("https://demoqa.com/");
-      // await page.locator("div:nth-of-type(6)>div>.card-up").click();
-      // await page
-      //   .locator(".collapse.element-list.show > .menu-list > li:nth-of-type(1)")
-      //   .click();
-      // await page.getByText("Login");
-      // await page.locator("#userName").fill(userName);
-      // await page.locator("#password").fill(password);
-      // await page.locator("#login").click();
-      // await expect(page.getByText("User Name :")).toBeVisible();
-      // // await expect(page.getByRole('link', { name: 'Speaking JavaScript'})).toBeVisible();
     });
-    test("Why this test at all ? -> Goal is to receive error 401 for Add book to the user by isbn book number", async ({ page }) => {
+    test("Check that there are no added books due to invalid token", async ({ page }) => {
       const isbnNumbers = await bookStoreApi.getAllIsbns();
       expect(isbnNumbers.length, "No books in isbn numbers").toBeGreaterThan(0);
       let count = isbnNumbers.length;
@@ -185,25 +205,27 @@ test.describe("Add books via API call to the created user by another API", async
       );
       expect(addBookToTheUser).toHaveProperty("status", 401);
 
-      // await successfullyLogin(page, userName, password);
-      // await page.goto("https://demoqa.com/");
-      // await page.locator("div:nth-of-type(6)>div>.card-up").click();
-      // await page
-      //   .locator(".collapse.element-list.show > .menu-list > li:nth-of-type(1)")
-      //   .click();
-      // await page.getByText("Login");
-      // await page.locator("#userName").fill(userName);
-      // await page.locator("#password").fill(password);
-      // await page.locator("#login").click();
-      // await expect(page.getByText("User Name :")).toBeVisible();
+      await loginPage.open();
+      await loginPage.login({userName, password});
+      await expect(page).toHaveURL("https://demoqa.com/profile");
+
+      await page.waitForSelector("[role='rowgroup']", { state: 'visible', timeout: 3000});
+      const emptyTableRows = await page.locator("[role='rowgroup']").all(); //.allInnerTexts();
+      expect(emptyTableRows.length).toBe(5);
+
+      const table = new Table(await page.locator("[role='grid']"));
+      let arr = await table.getBookTitle();
+
+      const result = arr.length > 0 ? arr[0] : "The field is empty";
+      console.log("The result of the checking first book is -> " + (result !== undefined ? result : "Sorry, there are no added books..."));
+      expect(result).toBeUndefined();
     });
-    test("why this test ? -> Goal is to receive error 400 for Add book to the user by isbn book number", async ({ page }) => {
+    test("Check that there are no added books due to invalid isbn number", async ({ page }) => {
       const isbnNumbers = await bookStoreApi.getAllIsbns();
       expect(isbnNumbers.length, "No books in isbn numbers").toBeGreaterThan(0);
       let count = isbnNumbers.length;
       const randomIsbnIndex = await DataClass.generateIsbnIndex(count);
       randomIsbn = isbnNumbers[randomIsbnIndex] + `invalidNumberToSeeError`;
-      console.log(randomIsbn);
 
       // Add books to the user's collection
       const addBookToTheUser = await bookStoreApi.addBookToTheUserByIsbn(
@@ -213,19 +235,22 @@ test.describe("Add books via API call to the created user by another API", async
       );
       expect(addBookToTheUser).toHaveProperty("status", 400);
 
-      // await successfullyLogin(page, userName, password);
-      // await page.goto("https://demoqa.com/");
-      // await page.locator("div:nth-of-type(6)>div>.card-up").click();
-      // await page
-      //   .locator(".collapse.element-list.show > .menu-list > li:nth-of-type(1)")
-      //   .click();
-      // await page.getByText("Login");
-      // await page.locator("#userName").fill(userName);
-      // await page.locator("#password").fill(password);
-      // await page.locator("#login").click();
-      // await expect(page.getByText("User Name :")).toBeVisible();
+      await loginPage.open();
+      await loginPage.login({userName, password});
+      await expect(page).toHaveURL("https://demoqa.com/profile");
+
+      await page.waitForSelector("[role='rowgroup']", { state: 'visible', timeout: 3000});
+      const emptyTableRows = await page.locator("[role='rowgroup']").all();
+      expect(emptyTableRows.length).toBe(5);
+
+      const table = new Table(await page.locator("[role='grid']"));
+      let arr = await table.getBookTitle();
+
+      const result = arr.length > 0 ? arr[0] : "The field is empty";
+      console.log("The result of the checking first book is -> " + (result !== undefined ? result : "Sorry, there are no added books..."));
+      expect(result).toBeUndefined();
     });
-    test("Where is check books on UI? -> Add two random books to the user by isbn book numbers", async ({ page }) => {
+    test("Add two random books to the user by isbn book numbers", async ({ page }) => {
       const isbnNumbers = await bookStoreApi.getAllIsbns();
       expect(isbnNumbers.length, "No books in isbn numbers").toBeGreaterThan(0);
       let count = isbnNumbers.length;
@@ -252,19 +277,18 @@ test.describe("Add books via API call to the created user by another API", async
         [randomSecondIsbn]
       );
       expect(addAnotherBookToTheUser).toHaveProperty("status", 201);
+      
+      createNewUser = await accountApi.getUser(userId, token);
+      // Update data for the created user (to see books)
+      console.log(createNewUser.data.books);
+      console.log("ISBN #1 = " + randomFirstIsbn);
+      console.log("ISBN #2 = " + randomSecondIsbn);
 
-      // await successfullyLogin(page, userName, password);
-      // await page.goto("https://demoqa.com/");
-      // await page.locator("div:nth-of-type(6)>div>.card-up").click();
-      // await page
-      //   .locator(".collapse.element-list.show > .menu-list > li:nth-of-type(1)")
-      //   .click();
-      // await page.getByText("Login");
-      // await page.locator("#userName").fill(userName);
-      // await page.locator("#password").fill(password);
-      // await page.locator("#login").click();
-      // await expect(page.getByText("User Name :")).toBeVisible();
-      // await expect(page.getByRole('link', { name: 'Speaking JavaScript'})).toBeVisible();
+      await loginPage.open();
+      await loginPage.login({userName, password});
+      await expect(page).toHaveURL("https://demoqa.com/profile");
+      await loginPage.isbnsSwitch(randomFirstIsbn);
+      await loginPage.isbnsSwitch(randomSecondIsbn);
     });
   });
 
@@ -272,39 +296,27 @@ test.describe("Add books via API call to the created user by another API", async
     userName = `testUser${Date.now()}`;
     password = "1qaz@WSX";
 
-    test.beforeEach(
-      "Create user with token & userId by calling API",
-      async () => {
+    test.beforeEach("Create new user with token & userId by calling API", async ({ page }) => {
         createNewUser = await accountApi.createNewUser(userName, password);
         token = (await accountApi.generateToken(userName, password)).data.token;
-        const authorization = await accountApi.authorization(
-          userName,
-          password
-        );
+        const authorization = await accountApi.authorization(userName, password);
         userId = createNewUser.data.userID;
-        // console.log(createNewUser.data);
+        loginPage = new LoginPage(page);
       }
     );
 
     test("Go To Book Store button check", async ({ page }) => {
       test.slow();
-      await page.goto("https://demoqa.com/");
-      await page.locator("div:nth-of-type(6)>div>.card-up").click();
-      // await page.locator(".collapse.element-list.show > .menu-list > li:nth-of-type(1)").click();
-      await page.getByRole("button", { name: "Login" }).click();
-      await page.getByText("Login");
-      await page.locator("#userName").fill(userName);
-      await page.locator("#password").fill(password);
-      await page.locator("#login").click();
+      await loginPage.open();
+      await loginPage.login({userName, password});
 
       await page.goto("https://demoqa.com/books");
       await page.waitForSelector('//*[@id="see-book-Git Pocket Guide"]', {
         state: "visible",
-        timeout: 10000,
+        timeout: 5000,
       });
       await page.getByRole("link", { name: "Git Pocket Guide" }).isVisible();
       //Click Go to book store button
-      // await page.locator('#gotoStore').click();
       await expect(page).toHaveURL("https://demoqa.com/books");
     });
 
@@ -323,13 +335,8 @@ test.describe("Add books via API call to the created user by another API", async
       );
       // await bookStoreApi.addBookToTheUserByIsbn(userId, token, [randomIsbn]);
 
-      await page.goto("https://demoqa.com/login");
-      await page.getByText("Login");
-      await page.locator("#userName").fill(userName);
-      await page.locator("#password").fill(password);
-      await page.locator("#login").click();
-
-      await expect(page).toHaveURL("https://demoqa.com/profile");
+      await loginPage.open();
+      await loginPage.login({userName, password});
       await page.waitForSelector("#searchBox", {
         state: "visible",
         timeout: 10000,

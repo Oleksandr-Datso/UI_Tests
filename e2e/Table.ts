@@ -13,14 +13,17 @@ export class Table {
     async getBookTitle() {
       // Recieve list of all titles
       const books = await this.getAllRows();
+      let bookTitleList = [];
       for (let i = 1; i <= books.length; i++) {
         const bookCells = await books[i - 1].locator("[role='gridcell']").all();
         const bookCell = bookCells[1]; //All info for the element 1 for index = i
         const bookTitle = await bookCell.locator("a").allInnerTexts();
-        if (bookTitle != "") {
-          console.log("Book title #" + i + " = " + bookTitle);
+        if (bookTitle[0] != "") {
+          console.log("Book title #" + i + " = " + bookTitle[0]);
         }
+        bookTitleList.push(bookTitle[0]);
       }
+      return bookTitleList;
     }
     async getBookTitleToBeReturned() {
       // Recieve list of all titles
