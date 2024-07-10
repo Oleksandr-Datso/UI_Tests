@@ -12,6 +12,7 @@ export class LoginPage {
     registerButton;
     backToLoginButton;
     searchBoxField;
+    loginURL;
     logoutButton;
 
     constructor(private page: Page) { //щоб не передавати кожен раз page у методи, стає атрібутом класа, який можно переюзати
@@ -25,6 +26,7 @@ export class LoginPage {
         this.backToLoginButton = this.page.locator("#gotologin");
         this.searchBoxField = this.page.locator("#searchBox");
         this.logoutButton = this.page.getByText("Log out");
+        this.loginURL = "https://demoqa.com/login";
         }    
     async open() {
         await this.page.goto("https://demoqa.com/");
@@ -66,9 +68,47 @@ export class LoginPage {
     async navigateToLoginPage() {
         await this.loginButton.click();
     }
+    async redirectToLoginPage() {
+      await this.page.goto(this.loginURL);
+    }
     //Do I need to add here open Login page from Book Store page if button exists ? 
     async navigateToProfilePage() {
         await this.page.goto("https://demoqa.com/profile");
+    }
+    async deleteBook() {
+      await this.page
+        .getByRole("gridcell", { name: "Delete" }).first()
+        .locator("path")
+        .click();
+      expect(await this.page.getByText("Delete Book").isVisible());
+      expect(await this.page.getByText("Do you want to delete this").isVisible());
+      await this.page.getByRole("button", { name: "Cancel" }).click();
+      await this.page
+        .getByRole("gridcell", { name: "Delete" }).first()
+        .locator("path")
+        .click();
+      await this.page.getByRole("button", { name: "OK" }).click();
+    }
+    async deletAllBooksPopUp() {
+      await this.page.locator("li").filter({ hasText: "Profile" }).click();
+      await expect(this.page.getByRole("textbox", { name: "Type to search" })).toBeVisible();
+      await this.page.getByRole("button", { name: "Delete All Books" }).click();
+      await this.page.getByText("Do you want to delete all books?").isVisible();
+    }
+    async confirmButton() {
+      await this.page.getByRole("button", { name: "OK" }).click();
+    }
+    async cancelButton() {
+      await this.page.getByRole("button", {name: "Cancel"});
+    }
+    async deleteFirstInstanceInRow() {
+      await this.page.locator("#delete-record-undefined").first().click(); //The saem as -> await page.locator('#delete-record-undefined').nth(0).click();
+      await this.page.getByText("Do you want to delete this book?").isVisible();
+      await this.page.locator("#closeSmallModal-ok").click();
+    }
+    async deleteAccount() {
+      await this.page.getByRole("button", { name: "Delete Account" }).click();
+      await this.page.getByText("Do you want to delete your account?").isVisible();
     }
     async logout() {
         await this.logoutButton.click();

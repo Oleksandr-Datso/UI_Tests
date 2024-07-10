@@ -1,0 +1,12 @@
+Performance results for option #1 = 275.9258999824524 ms
+Book 1 is published by - O'Reilly Media
+Book 2 is published by - O'Reilly Media
+Book 3 is published by - O'Reilly Media
+Book 4 is published by - O'Reilly Media
+Book 5 is published by - O'Reilly Media
+Book 6 is published by - O'Reilly Media
+Book 7 is published by - No Starch Press
+Book 8 is published by - No Starch Press
+Performance results for option #2 = 485.12860000133514 ms
+Convert results from object into array -> O'Reilly Media, No Starch Press
+List of unique publishers -> O'Reilly Media, No Starch Press

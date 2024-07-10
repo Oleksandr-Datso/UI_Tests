@@ -6,6 +6,7 @@ import { BookStoreApi } from "../api/BookStoreApi";
 import { DataClass } from "../api/data";
 import { Table } from "../e2e/Table";
 import { LoginPage } from "./LoginFunctions";
+import { allure } from "allure-playwright";
 
 
 let accountApi = new AccountApi("https://demoqa.com");
@@ -13,6 +14,7 @@ let bookStoreApi = new BookStoreApi("https://demoqa.com");
 let loginPage;
 
 test("check open", async({ page }) => {
+  test.slow();
   loginPage = new LoginPage(page);
   await loginPage.open();
 })
@@ -34,30 +36,44 @@ test.describe("Tests with Login", async () => {
   // чого в мене автоматично не закривається браузер після тесту
   //   await page.close();
   // });
-  test("Login page", async ({ page }) => {
-    // const loginPage = new LoginPage(page);
-    await loginPage.open();
-    await loginPage.login({userName, password});
-    
-    await expect(page).toHaveURL("https://demoqa.com/profile");
-    await expect(page.getByText(userName)).toBeVisible();
+  test("Login page", {tag: '@positiveTests'}, async ({ page }) => {
+    await allure.step("Open the login page", async () => {
+      await loginPage.open();
+    });
+    await allure.step("Add credentials and click login button", async () => {
+      await loginPage.login({userName, password});
+    });
+    await allure.step("Expect checks", async () => {
+      await expect(page).toHaveURL("https://demoqa.com/profile");
+      await expect(page.getByText(userName)).toBeVisible();
+    });
   });
   test("Login page with empty data", async ({ page }) => {
+    test.slow();
     userName = "";
-    await loginPage.open();
-    await loginPage.login({userName, password});
-    // Expect is present in method, need to find way to add it here instead
+    await allure.step("Open the login page", async () => {
+      await loginPage.open();
+    });
+    await allure.step("Add credentials and click login button", async () => {
+      await loginPage.login({userName, password});
+    });
     expect(await loginPage.isInvalid(attributeName)).toBeTruthy();    
   });
-  test("Register new user", async ({ page }) => {
-    await loginPage.open();
+  test("Register new user", {tag: '@positiveTests'}, async ({ page }) => {
+    test.slow();
+    await allure.step("Open the login page", async () => {
+      await loginPage.open();
+    });
     await loginPage.registerNewUser({firstName, lastName, userName, password});
     console.log("New registered user -> " + userName);
 
     // what expect to add here?
   });
   test("Register existing user", async ({ page }) => {
-    await loginPage.open();
+    test.slow();
+    await allure.step("Open the login page", async () => {
+      await loginPage.open();
+    });
     await loginPage.registerNewUser({firstName, lastName, userName, password});
 
     expect(await page.getByText('User exists!').isVisible());
@@ -67,14 +83,20 @@ test.describe("Tests with Login", async () => {
     // expect(page.locator("#name")).toContainText("User exists!");
   });
   test("Register new user with empty data", async ({}) => {
-    await loginPage.open();
+    test.slow();
+    await allure.step("Open the login page", async () => {
+      await loginPage.open();
+    });
     userName = "";
     await loginPage.registerNewUser({firstName, lastName, userName, password});
 
     expect(await loginPage.isInvalid(attributeName)).toBeTruthy();
   });
   test("Login back button from Registration page", async ({ page }) => {
-    await loginPage.open();
+    test.slow();
+    await allure.step("Open the login page", async () => {
+      await loginPage.open();
+    });
     userName = "";
     await loginPage.registerNewUser({firstName, lastName, userName, password});
     await loginPage.backToLoginFromRegistration();
@@ -82,41 +104,54 @@ test.describe("Tests with Login", async () => {
     expect(await page.getByText("Login in Book Store").isVisible());
     await expect(page).toHaveURL("https://demoqa.com/login");    
   });
-  test("Book Store page", async ({ page }) => {
-    await loginPage.open();
+  test("Book Store page", {tag: '@positiveTests'}, async ({ page }) => {
+    await allure.step("Open the login page", async () => {
+      await loginPage.open();
+    });
     await loginPage.navigateToBookStorePage();
     await expect(page).toHaveURL("https://demoqa.com/books");
   });
-  test("Search book on Book Store page", async ({ page }) => {
-    await loginPage.open();
+  test("Search book on Book Store page", {tag: '@positiveTests'}, async ({ page }) => {
+    await allure.step("Open the login page", async () => {
+      await loginPage.open();
+    });
     await loginPage.navigateToBookStorePage();
     await loginPage.searchBook(book);
 
     expect(await page.getByRole("link", {name: book}).isVisible());
   });
-  test("Login button from Book Store page", async ({ page }) => {
-    await loginPage.open();
+  test("Login button from Book Store page", {tag: '@positiveTests'}, async ({ page }) => {
+    await allure.step("Open the login page", async () => {
+      await loginPage.open();
+    });
     await loginPage.navigateToBookStorePage();
     await loginPage.navigateToLoginPage();
 
-    expect(await page.getByText("Welcome,")).toBeVisible();
+    expect(await page.getByText("Login in Book Store").isVisible());
   });
   test("Check not loggin text when open Profile page without logged in", async ({ page }) => {
-    await loginPage.open();
+    test.slow();
+    await allure.step("Open the login page", async () => {
+      await loginPage.open();
+    });
     await loginPage.navigateToProfilePage();
 
     expect(await page.locator("#notLoggin-label").isVisible());
     expect(await page.getByText("Currently you are not logged into the Book Store application, please visit the ").isVisible());
   });
-  test("Check redirection to Login page after logged in", async ({ page }) => {
-    await loginPage.open();
+  test("Check redirection to Login page after logged in", {tag: '@positiveTests'}, async ({ page }) => {
+    await allure.step("Open the login page", async () => {
+      await loginPage.open();
+    });
     await loginPage.login({userName, password});
-    await loginPage.navigateToLoginPage();
+    await loginPage.redirectToLoginPage();
 
     expect(await page.getByText("You are already logged in. View your ").isVisible());
   });
-  test("Logout", async ({ page }) => {
-    await loginPage.open();
+  test("Logout", {tag: '@positiveTests'}, async ({ page }) => {
+    await allure.step("Open the login page", async () => {
+      await loginPage.open();
+    });
     await loginPage.login({userName, password});
     await loginPage.logout();
 
@@ -132,6 +167,11 @@ test.describe("Add books via API call to the created user by another API", async
   let password = "1qaz@WSX";
   let book = "Speaking JavaScript";
   let isbnNumber = "9781449365035";
+  let listOfBooksIsbns =         
+  [
+    9781449325862, 9781449331818, 9781449337711, 9781449365035,
+    9781491904244, 9781491950296, 9781593275846, 9781593277574,
+  ];
 
   //For do actions with books needed variables:
   let createNewUser, userId, token, randomIsbn;
@@ -157,7 +197,9 @@ test.describe("Add books via API call to the created user by another API", async
       createNewUser = await accountApi.getUser(userId, token);
       console.log(createNewUser.data.books);
 
-      await loginPage.open();
+      await allure.step("Open the login page", async () => {
+        await loginPage.open();
+      });
       await loginPage.login({userName, password});
       await expect(page).toHaveURL("https://demoqa.com/profile");
       await expect(page.getByRole("link", {name: "Speaking JavaScript"})).toContainText("Speaking JavaScript");
@@ -183,7 +225,9 @@ test.describe("Add books via API call to the created user by another API", async
       console.log(createNewUser.data.books);
       console.log("ISBN = " + randomIsbn);
 
-      await loginPage.open();
+      await allure.step("Open the login page", async () => {
+        await loginPage.open();
+      });
       await loginPage.login({userName, password});
       await expect(page).toHaveURL("https://demoqa.com/profile");
       await loginPage.isbnsSwitch(randomIsbn);
@@ -205,7 +249,9 @@ test.describe("Add books via API call to the created user by another API", async
       );
       expect(addBookToTheUser).toHaveProperty("status", 401);
 
-      await loginPage.open();
+      await allure.step("Open the login page", async () => {
+        await loginPage.open();
+      });
       await loginPage.login({userName, password});
       await expect(page).toHaveURL("https://demoqa.com/profile");
 
@@ -235,7 +281,9 @@ test.describe("Add books via API call to the created user by another API", async
       );
       expect(addBookToTheUser).toHaveProperty("status", 400);
 
-      await loginPage.open();
+      await allure.step("Open the login page", async () => {
+        await loginPage.open();
+      });
       await loginPage.login({userName, password});
       await expect(page).toHaveURL("https://demoqa.com/profile");
 
@@ -264,7 +312,7 @@ test.describe("Add books via API call to the created user by another API", async
       const randomFirstIsbn = isbnNumbers[randomFirstIsbnIndex];
       const randomSecondIsbn = isbnNumbers[randomSecondIsbnIndex];
 
-      // Add books to the user's collection
+//       // Add books to the user's collection
       const addBookToTheUser = await bookStoreApi.addBookToTheUserByIsbn(
         userId,
         token,
@@ -284,7 +332,9 @@ test.describe("Add books via API call to the created user by another API", async
       console.log("ISBN #1 = " + randomFirstIsbn);
       console.log("ISBN #2 = " + randomSecondIsbn);
 
-      await loginPage.open();
+      await allure.step("Open the login page", async () => {
+        await loginPage.open();
+      });
       await loginPage.login({userName, password});
       await expect(page).toHaveURL("https://demoqa.com/profile");
       await loginPage.isbnsSwitch(randomFirstIsbn);
@@ -307,7 +357,9 @@ test.describe("Add books via API call to the created user by another API", async
 
     test("Go To Book Store button check", async ({ page }) => {
       test.slow();
-      await loginPage.open();
+      await allure.step("Open the login page", async () => {
+        await loginPage.open();
+      });
       await loginPage.login({userName, password});
 
       await page.goto("https://demoqa.com/books");
@@ -335,7 +387,9 @@ test.describe("Add books via API call to the created user by another API", async
       );
       // await bookStoreApi.addBookToTheUserByIsbn(userId, token, [randomIsbn]);
 
-      await loginPage.open();
+      await allure.step("Open the login page", async () => {
+        await loginPage.open();
+      });
       await loginPage.login({userName, password});
       await page.waitForSelector("#searchBox", {
         state: "visible",
@@ -351,87 +405,32 @@ test.describe("Add books via API call to the created user by another API", async
 
       await page.getByText(returnedTitleIntoQuotes).isVisible();
       // Delete book flow
-      await page
-        .getByRole("gridcell", { name: "Delete" }).first()
-        .locator("path")
-        .click();
-      expect(await page.getByText("Delete Book").isVisible());
-      expect(await page.getByText("Do you want to delete this").isVisible());
-      await page.getByRole("button", { name: "Cancel" }).click();
-      await page
-        .getByRole("gridcell", { name: "Delete" }).first()
-        .locator("path")
-        .click();
-      await page.getByRole("button", { name: "OK" }).click();
-    });
-
-    test('Add random book by ISBN and delete it by clicking "delete" icon on UI', async ({
-      page,
-    }) => {
-      test.slow();
-      const isbnNumbers = await bookStoreApi.getAllIsbns();
-      expect(isbnNumbers.length, "No books in isbn numbers").toBeGreaterThan(0);
-      let count = isbnNumbers.length;
-      const randomIsbnIndex = await DataClass.generateIsbnIndex(count);
-      randomIsbn = isbnNumbers[randomIsbnIndex];
-
-      // Add books to the user's collection
-      const addBookToTheUser = await bookStoreApi.addBookToTheUserByIsbn(
-        userId,
-        token,
-        [randomIsbn]
-      );
-      expect(addBookToTheUser).toHaveProperty("status", 201);
-
-      await page.goto("https://demoqa.com/");
-      await page.locator("div:nth-of-type(6)>div>.card-up").click();
-      await page.getByRole("button", { name: "Login" }).click();
-      await page.getByText("Welcome").isVisible();
-      await page.locator("#userName").fill(userName);
-      await page.locator("#password").fill(password);
-      await page.keyboard.press("Enter");
-      // await page.locator("#login").click();
-      await page.waitForSelector("#userName-label", {
-        state: "visible",
-        timeout: 10000,
-      });
-      await page
-        .locator(".collapse.element-list.show > .menu-list > li:nth-of-type(3)")
-        .click();
-      await expect(page.getByText("Books :")).toBeVisible();
-
-      //Click delete any available book
-      await page.locator("#delete-record-undefined").click();
-      await expect(page.getByText("Delete Book")).toBeVisible();
-      await expect(
-        page.getByText("Do you want to delete this book?")
-      ).toBeVisible();
-      await page.locator("#closeSmallModal-ok").click();
+      await loginPage.deleteBook();
     });
     test('"Delete All Books" button check without books', async ({ page }) => {
       test.slow();
-      await page.goto("https://demoqa.com/");
-      await page.locator("div:nth-of-type(6)>div>.card-up").click();
-      // await page.locator(".collapse.element-list.show > .menu-list > li:nth-of-type(1)").click();
-      await page.getByRole("button", { name: "Login" }).click();
-      await page.getByText("Login");
-      await page.locator("#userName").fill(userName);
-      await page.locator("#password").fill(password);
-      await page.locator("#login").click();
+      await allure.step("Open the login page", async () => {
+        await loginPage.open();
+      });
+      await loginPage.login({userName, password});
       await expect(page.getByText("User Name :")).toBeVisible();
+      await loginPage.deletAllBooksPopUp();
+      await loginPage.confirmButton();
+      await page.reload();
 
-      await page.locator("li").filter({ hasText: "Profile" }).click();
-      // await page.locator("//div[@id='app']/div[@class='body-height']/div[@class='container playgound-body']/div[@class='row']//div[@class='accordion']/div[6]/div/ul[@class='menu-list']/li[3]/span[@class='text']").click();
-      //Click delete all books button
-      await expect(
-        page.getByRole("textbox", { name: "Type to search" })
-      ).toBeVisible();
-      await page.getByRole("button", { name: "Delete All Books" }).click();
-      await page.getByText("Do you want to delete all books?").isVisible();
+      await page.waitForSelector("[role='rowgroup']", {state: "visible", timeout: 3000});
+      const emptyTableRows = await page.locator("[role='rowgroup']").all();
+      expect(emptyTableRows.length).toBe(5);
+
+      const table = new Table(await page.locator("[role='grid']"));
+      let arr = await table.getBookTitle();
+
+      const result = arr.length > 0 ? arr[0] : "The field is empty";
+      console.log("The result of the checking first book is -> " + (result !== undefined ? result : "Sorry, there are no added books..."));
+      expect(result).toBeUndefined();
     });
     test('"Delete All Books" button check with books', async ({ page }) => {
       test.slow();
-
       await bookStoreApi.addBookToTheUserByIsbn(
         userId,
         token,
@@ -441,24 +440,17 @@ test.describe("Add books via API call to the created user by another API", async
         ]
       );
 
-      await page.goto("https://demoqa.com/");
-      await page.locator("div:nth-of-type(6)>div>.card-up").click();
+      await allure.step("Open the login page", async () => {
+        await loginPage.open();
+      });
+      await loginPage.login({userName, password});
 
-      //Login with user credentials
-      await page.getByRole("button", { name: "Login" }).click();
-      await page.locator("#userName").fill(userName);
-      await page.locator("#password").fill(password);
-      await page.locator("#login").click();
       await expect(page.getByText("User Name :")).toBeVisible();
       await page.locator("li").filter({ hasText: "Profile" }).click();
 
       //Click delete all books button
-      await expect(
-        page.getByRole("textbox", { name: "Type to search" })
-      ).toBeVisible();
-      await page.getByRole("button", { name: "Delete All Books" }).click();
-      await page.getByText("Do you want to delete all books?").isVisible();
-      await page.locator("#closeSmallModal-ok").click();
+      await loginPage.deletAllBooksPopUp();
+      await loginPage.confirmButton();
 
       //Check that rows do not contain any data
       await page.reload();
@@ -477,66 +469,51 @@ test.describe("Add books via API call to the created user by another API", async
       expect(arr).toHaveLength(0);
     });
     test("Delete first book from the list of all books", async ({ page }) => {
-      test.slow();
-
       // Add manually all books by isbns
       await bookStoreApi.addBookToTheUserByIsbn(
         userId,
         token,
-        [
-          9781449325862, 9781449331818, 9781449337711, 9781449365035,
-          9781491904244, 9781491950296, 9781593275846, 9781593277574,
-        ]
+        listOfBooksIsbns
       );
 
-      await page.goto("https://demoqa.com/");
-      await page.locator("div:nth-of-type(6)>div>.card-up").click();
-      // await page.locator(".collapse.element-list.show > .menu-list > li:nth-of-type(1)").click();
-
-      //Login with user credentials
-      await page.getByRole("button", { name: "Login" }).click();
-      await page.locator("#userName").fill(userName);
-      await page.locator("#password").fill(password);
-      await page.locator("#login").click();
-      await expect(page.getByText("User Name :")).toBeVisible();
-      await page.locator("li").filter({ hasText: "Profile" }).click();
+      await allure.step("Open the login page", async () => {
+        await loginPage.open();
+      });
+      await loginPage.login({userName, password});
 
       await expect(page.getByText("User Name :")).toBeVisible();
-
       const table = new Table(await page.locator("[role='grid']"));
-      await table.getBookTitle();
+      let array1 = [];
+      array1 = await table.getBookTitle();
 
-      await page.locator("#delete-record-undefined").first().click(); //The saem as -> await page.locator('#delete-record-undefined').nth(0).click();
-      await page.getByText("Do you want to delete this book?").isVisible();
-      await page.locator("#closeSmallModal-ok").click();
+      await loginPage.deleteFirstInstanceInRow();
+      console.log("- - - - - -");
 
       // Need to reload page to see changes
-      await page.reload();
+      await page. reload();
       await expect(page.getByText("User Name :")).toBeVisible();
-      console.log("- - - - - -");
-      await table.getBookTitle();
+      let array2 = [];
+      array2 = await table.getBookTitle();
+
+      for (let i=0; i<array2.length; i++) {
+        if (array1[i] === array2[i]) {
+          throw new Error("The first instance is not deleted!");
+        }
+      }
     });
     test('"Delete Account" button check', async ({ page }) => {
-      test.slow();
-      await page.goto("https://demoqa.com/");
-      await page.locator("div:nth-of-type(6)>div>.card-up").click();
-      // await page.locator(".collapse.element-list.show > .menu-list > li:nth-of-type(1)").click();
-      await page.getByRole("button", { name: "Login" }).click();
-      await page.getByText("Login");
-      await page.locator("#userName").fill(userName);
-      await page.locator("#password").fill(password);
-      await page.locator("#login").click();
+      await allure.step("Open the login page", async () => {
+        await loginPage.open();
+      });
+      await loginPage.login({userName, password});
       await expect(page.getByText("User Name :")).toBeVisible();
 
       await page.locator("li").filter({ hasText: "Profile" }).click();
       await expect(
         page.getByRole("textbox", { name: "Type to search" })
       ).toBeVisible();
-      await page.getByRole("button", { name: "Delete Account" }).click();
-      await page.getByText("Do you want to delete your account?").isVisible();
-      await page.getByRole("button", { name: "Cancel" }).click();
-      await page.getByRole("button", { name: "Delete Account" }).click();
-      await page.getByRole("button", { name: "OK" }).click();
+      await loginPage.deleteAccount();
+      await loginPage.confirmButton();
       await page.getByText("Welcome").isVisible();
     });
   });

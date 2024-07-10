@@ -1,4 +1,0 @@
-status = 201
-And data = [object Object]
-username = testUser1712603498070
-password = 1qaz@WSX

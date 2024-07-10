@@ -1,0 +1,7 @@
+username = testUser1720354214901
+password = 1qaz@WSX
+Performance results for option #1 = 25.00949999690056 ms
+Performance results for option #2 = 68.0527999997139 ms
+Convert results from object into array -> 
+List of unique publishers -> 
+

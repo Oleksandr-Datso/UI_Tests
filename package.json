@@ -7,7 +7,8 @@
   "scripts": {
     "testBooks": "mocha ./api/testWithBooks.js",
     "testAccounts": "mocha ./api/testWithAccounts.js",
-    "test": "playwright test"
+    "test": "playwright test",
+    "report": "npx allure serve allure-results"
   },
   "keywords": [],
   "author": "",
