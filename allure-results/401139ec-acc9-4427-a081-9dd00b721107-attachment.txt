@@ -1,8 +1,0 @@
-Book 1 has author - Richard E. Silverman
-Book 2 has author - Addy Osmani
-Book 3 has author - Glenn Block et al.
-Book 4 has author - Axel Rauschmayer
-Book 5 has author - Kyle Simpson
-Book 6 has author - Eric Elliott
-Book 7 has author - Marijn Haverbeke
-Book 8 has author - Nicholas C. Zakas

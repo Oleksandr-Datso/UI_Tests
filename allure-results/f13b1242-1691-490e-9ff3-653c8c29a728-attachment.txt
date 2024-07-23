@@ -1,8 +1,0 @@
-username = testUser1720354215001
-password = 1qaz@WSX
-Book title #1 = Git Pocket Guide
-Book title #2 = Learning JavaScript Design Patterns
-Book title #3 = Designing Evolvable Web APIs with ASP.NET
-Book title #4 = Speaking JavaScript
-Book title #5 = You Don't Know JS
-- - - - - -

@@ -1,2 +1,0 @@
-username = testUser1720351096062
-password = 1qaz@WSX

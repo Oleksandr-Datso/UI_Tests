@@ -37,16 +37,15 @@ test.describe("Tests with Login", async () => {
   //   await page.close();
   // });
   test("Login page", {tag: '@positiveTests'}, async ({ page }) => {
-    await allure.step("Open the login page", async () => {
-      await loginPage.open();
-    });
+    test.slow();
+    await loginPage.open();
     await allure.step("Add credentials and click login button", async () => {
       await loginPage.login({userName, password});
     });
     await allure.step("Expect checks", async () => {
       await expect(page).toHaveURL("https://demoqa.com/profile");
       await expect(page.getByText(userName)).toBeVisible();
-    });
+    })
   });
   test("Login page with empty data", async ({ page }) => {
     test.slow();
@@ -105,6 +104,7 @@ test.describe("Tests with Login", async () => {
     await expect(page).toHaveURL("https://demoqa.com/login");    
   });
   test("Book Store page", {tag: '@positiveTests'}, async ({ page }) => {
+    test.slow();
     await allure.step("Open the login page", async () => {
       await loginPage.open();
     });
@@ -112,6 +112,7 @@ test.describe("Tests with Login", async () => {
     await expect(page).toHaveURL("https://demoqa.com/books");
   });
   test("Search book on Book Store page", {tag: '@positiveTests'}, async ({ page }) => {
+    test.slow();
     await allure.step("Open the login page", async () => {
       await loginPage.open();
     });
@@ -121,6 +122,7 @@ test.describe("Tests with Login", async () => {
     expect(await page.getByRole("link", {name: book}).isVisible());
   });
   test("Login button from Book Store page", {tag: '@positiveTests'}, async ({ page }) => {
+    test.slow();
     await allure.step("Open the login page", async () => {
       await loginPage.open();
     });
@@ -140,6 +142,7 @@ test.describe("Tests with Login", async () => {
     expect(await page.getByText("Currently you are not logged into the Book Store application, please visit the ").isVisible());
   });
   test("Check redirection to Login page after logged in", {tag: '@positiveTests'}, async ({ page }) => {
+    test.slow();
     await allure.step("Open the login page", async () => {
       await loginPage.open();
     });
@@ -149,6 +152,7 @@ test.describe("Tests with Login", async () => {
     expect(await page.getByText("You are already logged in. View your ").isVisible());
   });
   test("Logout", {tag: '@positiveTests'}, async ({ page }) => {
+    test.slow();
     await allure.step("Open the login page", async () => {
       await loginPage.open();
     });

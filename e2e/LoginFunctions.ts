@@ -1,4 +1,5 @@
 import { type Page, type Locator, expect } from '@playwright/test';
+import { allure } from "allure-playwright";
 
 type UserCredentials = {userName: string; password: string}; // тип UserCredentials з обов'язковими пропертіс userName і password, які будуть приймати тільки тип string
 
@@ -28,10 +29,15 @@ export class LoginPage {
         this.logoutButton = this.page.getByText("Log out");
         this.loginURL = "https://demoqa.com/login";
         }    
+        // await allure.step("Open the login page", async () => {
+        //   await loginPage.open();
+        // });
     async open() {
-        await this.page.goto("https://demoqa.com/");
-        await this.page.locator("div:nth-of-type(6)>div>.card-up").click();
-        await this.page.locator(".collapse.element-list.show > .menu-list > li:nth-of-type(1)").click();
+        await allure.step("Open login page", async () => {
+          await this.page.goto("https://demoqa.com/");
+          await this.page.locator("div:nth-of-type(6)>div>.card-up").click();
+          await this.page.locator(".collapse.element-list.show > .menu-list > li:nth-of-type(1)").click();
+        })
     }
     async login(userCredential: UserCredentials) { //як аргумент приймаємо один об'єкт userCredential типу UserCredentials
         await this.userNameField.fill(userCredential.userName);

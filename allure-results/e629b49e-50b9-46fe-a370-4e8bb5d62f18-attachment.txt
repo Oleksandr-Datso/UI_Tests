@@ -1,8 +1,0 @@
-username = testUser1720354186605
-password = 1qaz@WSX
-Book title #1 = undefined
-Book title #2 = undefined
-Book title #3 = undefined
-Book title #4 = undefined
-Book title #5 = undefined
-The result of the checking first book is -> Sorry, there are no added books...
