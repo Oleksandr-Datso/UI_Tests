@@ -7,11 +7,61 @@ import { DataClass } from "../api/data";
 import { Table } from "../e2e/Table";
 import { LoginPage } from "./LoginFunctions";
 import { allure } from "allure-playwright";
+  // Needed variables for creating user using in all tests
+import { defaultUserName, defaultPassword, defaultFirstName, defaultLastName, defaultAttributeName, defaultBook } from "./Data"; 
 
 
 let accountApi = new AccountApi("https://demoqa.com");
 let bookStoreApi = new BookStoreApi("https://demoqa.com");
-let loginPage;
+let loginPage, userName, password, firstName, lastName, attributeName, book;
+
+function usernameGenerator() {
+  let word = "user";  
+  let numbers = (Math.floor(100000 + Math.random() * 900000));
+  let result = `${word}${numbers}`;
+  console.log(result);
+  return result;
+}
+function passGen() {
+  const bigLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const smallLetters = 'abcdefghijklmnopqrstuvwxyz';
+  const numbers = '0123456789';
+  const symbols = '@#$%&*';
+  let result = '';
+
+  for (let i=0; i<4; i++) {
+    const randomIndex = Math.floor(Math.random() * bigLetters.length);
+    result += bigLetters[randomIndex];
+  }
+  console.log("The password is = " + result);
+  for (let i=0; i<4; i++) {
+    const randomIndex = Math.floor(Math.random() * smallLetters.length);
+    result += smallLetters[randomIndex];
+  }
+  console.log("The password is = " + result);
+  for (let i=0; i<4; i++) {
+    const randomIndex = Math.floor(Math.random() * numbers.length);
+    result += numbers[randomIndex];
+  }
+  console.log("The password is = " + result);
+  for (let i=0; i<2; i++) {
+    const randomIndex = Math.floor(Math.random() * symbols.length);
+    result += symbols[randomIndex];
+  }
+  console.log("The password is = " + result);
+  return password;
+}
+function passwordGenerator() {
+  let result = '@A';
+  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+
+  for(let i=0; i<8; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    result += characters[randomIndex];
+  }
+  console.log(result);
+  return result;
+}
 
 test("check open", async({ page }) => {
   test.slow();
@@ -20,15 +70,16 @@ test("check open", async({ page }) => {
 })
 
 test.describe("Tests with Login", async () => {
-  // Needed variables for creating user using in all tests
-  let userName = `testUser${Date.now()}`;
-  let password = "1qaz@WSX";
-  let firstName = "testing first name";
-  let lastName = "testing last name";
-  let attributeName = "class";
-  let book = "Speaking JavaScript";
 
   test.beforeEach("Create new user via API call", async ({ page }) => {
+    // Set default values before each test
+    userName = usernameGenerator();
+    password = passwordGenerator();
+    firstName = defaultFirstName;
+    lastName = defaultLastName;
+    attributeName = defaultAttributeName;
+    book = defaultBook;
+
     await accountApi.createNewUser(userName, password);
     loginPage = new LoginPage(page);
   });
